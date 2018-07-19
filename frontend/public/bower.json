@@ -1,0 +1,25 @@
+{
+  "name": "vmware-hack",
+  "authors": [
+    "Chenyang Ji"
+  ],
+  "description": "none",
+  "main": "none",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.6",
+    "colorbrewer": "~1.0.0",
+    "jsnetworkx": "~0.3.4",
+    "d3": "^4.2.6",
+    "socket.io-client": "*"
+  }
+}
