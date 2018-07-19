@@ -9,7 +9,6 @@ var debug = require('debug')('backend:server');
 var http = require('http');
 
 var data_process = require('../controller/collision');
-// console.log(data_processs);
 /**
  * Get port from environment and store in Express.
  */
@@ -102,8 +101,9 @@ var client_id = -1;
 
 io.on('connection', function(socket){
     client_id++;
-    socket.emit('news', client_id);
-    data_process.on_receive({id:socket.id, direction_key_press:[false,false,false,false,false,false], team:client_id % 2})
+    // console.log(socket.id);
+    socket.emit('news', {id:socket.id,team:client_id % 2});
+    data_process.on_receive({id:socket.id, direction_key_press:[false,false,false,false,false,false], team:client_id % 2});
     /**
      * broadcast to all user other than the new client
      */
@@ -116,7 +116,7 @@ io.on('connection', function(socket){
       data_process.on_receive(data['tank_data']);
     });
     socket.on('disconnect',(reason)=>{
-
+      data_process.on_leave(socket.id);
     });
 });
 

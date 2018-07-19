@@ -16,14 +16,14 @@ var blue_team = 0
 var red_team = 1
 var bullet_size = 2.5
 var tank_size = 5
-var bullet_life = 150
+var bullet_life = 200
 
 var VELLIMIT       = 15
 var HP             = 50
 var QUANTUM        = 0.01
-var BULLET_VEL         = 10
+var BULLET_VEL         = 12
 
-var s_param = 0.02
+var s_param = 0.03
 
 // tank_list = {
 // 		"aaa" : {id: "aaa", size: tank_size, position:{x:230, y:230}, velocity:{x:5, y:5}, team:blue_team, hp:50, angle:30},
@@ -71,7 +71,7 @@ function distance(pos1, pos2){
 function on_receive(tank_data){
 	//todo
 	if(!(tank_data["id"] in tank_list)){
-		spawn_pos = tank_data["team"] == blue_team ? {x:450, y:450}:{x:map_width-450, y:map_height-450};
+		spawn_pos = tank_data["team"] == blue_team ? {x:450 + Math.floor((Math.random() - 0.5) * 40) , y:450 + Math.floor((Math.random() - 0.5) * 40)}:{x:map_width-450 + Math.floor((Math.random() - 0.5) * 40), y:map_height-450 + Math.floor((Math.random() - 0.5) * 40)};
 		tank_list[tank_data["id"]] = {id: tank_data["id"], size: 5, position:{x:spawn_pos.x, y:spawn_pos.y}, velocity:{x:0, y:0}, 
 			team:tank_data["team"], hp:HP, angle: 0, nextBullet: bulletInterval}
 	}
@@ -82,8 +82,8 @@ function on_receive(tank_data){
 	vel = {x:curr_tank['velocity'].x, y:curr_tank['velocity'].y};
 	if (tank_data['direction_key_press'][0]) vel.x = curr_tank['velocity'].x - accV;
 	if (tank_data['direction_key_press'][1]) vel.x = curr_tank['velocity'].x + accV;
-	if (tank_data['direction_key_press'][2]) vel.y = curr_tank['velocity'].y + accV;
-	if (tank_data['direction_key_press'][3]) vel.y = curr_tank['velocity'].y - accV;
+	if (tank_data['direction_key_press'][2]) vel.y = curr_tank['velocity'].y - accV;
+	if (tank_data['direction_key_press'][3]) vel.y = curr_tank['velocity'].y + accV;
 
 	curr_tank['velocity'].x = vel.x < -VELLIMIT ? -VELLIMIT:(vel.x > VELLIMIT ? VELLIMIT:vel.x);
 	curr_tank['velocity'].y = vel.y < -VELLIMIT ? -VELLIMIT:(vel.y > VELLIMIT ? VELLIMIT:vel.y);
@@ -157,6 +157,10 @@ function on_update(){
 
 
 	collision_detection()
+}
+
+function on_leave(str_id){
+	delete tank_list[str_id]
 }
 
 
@@ -276,6 +280,7 @@ function collision_detection(){
 	bullet_array.splice(curr, bullet_array.length - curr)
 }
 
+
 function test(){
 
 	
@@ -300,6 +305,7 @@ function test(){
 }
 module.exports = {
 	on_receive,
-	on_send
+	on_send,
+	on_leave
 };
 //test()
