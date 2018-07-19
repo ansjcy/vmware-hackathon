@@ -84,13 +84,6 @@ let render = function () {
             let posX = d.position.x - me.position.x + mePosX;
             let posY = d.position.y - me.position.y + mePosY;
 
-            container.append("circle")
-                .attr("r", tank_size)
-                .attr("cx", posX)
-                .attr("cy", posY)
-                // .attr("opacity", 0.5)
-                .attr("fill", function(d) { return d.team == 0? team_color_0 : team_color_1 });
-
             container.append("g")
                 .attr("transform", "rotate("+ (d.cannons.direction) + " " + posX + " " + posY +")" + "translate(-"+ tank_size / 2 + "," + 0 + ")"+"")
                 .append("rect")
@@ -98,6 +91,13 @@ let render = function () {
                 .attr("height", tank_size * 2)
                 .attr("x", posX)
                 .attr("y", posY)
+                .attr("fill", function(d) { return "grey" });
+            
+            container.append("circle")
+                .attr("r", tank_size)
+                .attr("cx", posX)
+                .attr("cy", posY)
+                // .attr("opacity", 0.5)
                 .attr("fill", function(d) { return d.team == 0? team_color_0 : team_color_1 });
 
             container.append("rect")
@@ -189,6 +189,15 @@ let render = function () {
 // ****** draw myself **************
     let meTank = tankGroup.append("g")
         .attr("id", "tank-me");
+    meTank.append("g")
+        .attr("transform", "rotate("+ (me.cannons.direction) + " " + mePosX + " " + mePosY +")" + "translate(-"+ tank_size / 2 + "," + 0 + ")"+"")
+        .append("rect")
+        .attr("width", tank_size)
+        .attr("height", tank_size * 2)
+        .attr("x", mePosX)
+        .attr("y", mePosY)
+        .attr("fill", function(d) { return "grey" });
+
     meTank.append("circle")
         .attr("r", tank_size)
         .attr("cx", function (d) {
@@ -198,14 +207,6 @@ let render = function () {
             return mePosY;
         })
         // .attr("opacity", 0.5)
-        .attr("fill", me.team == 0? team_color_0 : team_color_1);
-    meTank.append("g")
-        .attr("transform", "rotate("+ (me.cannons.direction) + " " + mePosX + " " + mePosY +")" + "translate(-"+ tank_size / 2 + "," + 0 + ")"+"")
-        .append("rect")
-        .attr("width", tank_size)
-        .attr("height", tank_size * 2)
-        .attr("x", mePosX)
-        .attr("y", mePosY)
         .attr("fill", me.team == 0? team_color_0 : team_color_1);
     meTank.append("rect")
         .attr("width", hpbarWidth)
