@@ -53,7 +53,7 @@ let bulletData = [
 ];
 
 let gridData = [];
-for(let i = 0; i < 1000; i += 20)
+for(let i = 0; i < 10000; i += 20)
 {
     gridData.push({
         "type": "horizontal",
@@ -92,7 +92,7 @@ let render = function () {
                 .attr("x", posX)
                 .attr("y", posY)
                 .attr("fill", function(d) { return "grey" });
-            
+
             container.append("circle")
                 .attr("r", tank_size)
                 .attr("cx", posX)
