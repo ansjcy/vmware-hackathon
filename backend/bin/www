@@ -24,14 +24,6 @@ var server = http.createServer(app);
 
 
 /**
- * Create Socket.Io.
- */
-var io = require('socket.io')(server);
-io.on('connection', function(socket){
-    console.log('a user connected');
-});
-
-/**
  * Listen on provided port, on all network interfaces.
  */
 
@@ -98,3 +90,36 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+/**
+ * Create Socket.Io.
+ */
+var io = require('socket.io')(server,{
+    serveClient: false
+});
+
+io.on('connection', function(socket){
+    socket.emit('news', 'Welcome');
+    console.log('a user connected');
+    /**
+     * broadcast to all user other than the new client
+     */
+    socket.broadcast.emit('newClientConnect', 'New clients connects');
+
+    /**
+     * Listen to client event
+     */
+    socket.on('update',function (data) {
+
+    });
+});
+
+
+
+setTimeout(()=>{
+    io.sockets.emit("push",{
+        "task_positions":[],
+        "bullect_positions":[],
+        "hp":[]
+    });
+},3000);
