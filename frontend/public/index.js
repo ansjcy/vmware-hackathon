@@ -3,7 +3,7 @@
 // let tank_attrs = ['id', 'position', 'team'];
 
 let me =  {
-        "id": 0,
+        "id": "0",
         "position": {
             "x": 200,
             "y": 200
@@ -51,6 +51,25 @@ let bulletData = [
     //     }
     // }
 ];
+
+let gridData = [];
+for(let i = 0; i < 1000; i += 20)
+{
+    gridData.push({
+        "type": "horizontal",
+        "x": 0,
+        "y": i,
+        "width": svg_width,
+        "height": 2
+    });
+    gridData.push({
+        "type": "vertical",
+        "x": i,
+        "y": 0,
+        "width": 2,
+        "height": svg_height
+    });
+}
 
 let render = function () {
 
@@ -128,6 +147,31 @@ let render = function () {
         .attr("height", svg_height)
         .attr("id", "game-svg");
 
+    svgRaw.append("g")
+        .attr("id", "bg")
+        .selectAll(".grid")
+        .data(gridData)
+        .enter()
+        .append("rect")
+        .attr("x", function (d) {
+            return d.x - me.position.x + mePosX;
+        })
+        .attr("y", function (d) {
+            return d.y - me.position.y + mePosY;
+        })
+        .attr("width", function (d) {
+            return d.width;
+        })
+        .attr("height", function (d) {
+            return d.height;
+        })
+        .attr("fill", function (d) {
+            return "grey";
+        })
+        .attr("opacity", function (d) {
+            return 0.5;
+        });
+
     let svg = svgRaw.append("g")
         .attr("id", "svg-group")
         .attr("transform", function () {
@@ -202,8 +246,8 @@ var socket = io('10.2.123.139:3000');
 
 socket.on('news', function (data) {
     // console.log(data);
-    me.id = parseInt(data);
-    me.team = parseInt(data) % 2;
+    me.id = data.id;
+    me.team = data.team;
 });
 
 socket.on('push', function (data) {
