@@ -8,7 +8,8 @@ var app = require('../app');
 var debug = require('debug')('backend:server');
 var http = require('http');
 
-
+var data_process = require('../controller/collision');
+// console.log(data_processs);
 /**
  * Get port from environment and store in Express.
  */
@@ -116,7 +117,7 @@ io.on('connection', function(socket){
     });
 });
 
-
+setInterval(()=>{console.log(data_process.on_send())}, 1000)
 
 setTimeout(()=>{
     io.sockets.emit("push",{
