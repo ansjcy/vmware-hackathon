@@ -7,6 +7,7 @@ var m = 20
 var n = 20
 var space_grid = []
 
+
 //receive data through front end
 /*
 	tank_data:
