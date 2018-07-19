@@ -97,14 +97,16 @@ function onListening() {
 var io = require('socket.io')(server,{
     serveClient: false
 });
+var client_id = 0;
 
 io.on('connection', function(socket){
+    client_id++;
     socket.emit('news', 'Welcome');
     console.log('a user connected');
     /**
      * broadcast to all user other than the new client
      */
-    socket.broadcast.emit('newClientConnect', 'New clients connects');
+    socket.broadcast.emit('newClientConnect', `New ${client_id} clients connects`);
 
     /**
      * Listen to client event
