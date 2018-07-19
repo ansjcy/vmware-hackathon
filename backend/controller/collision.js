@@ -1,10 +1,16 @@
 
-var tank_list = {} //id, tank.size, tank.position, tank.velocity, tank.team, tank.angle, tank.hp
+var tank_list = {} //id, tank.size, tank.position, tank.velocity, tank.team, tank.angle, tank.hp, tank.nextBullet
 var bullet_array = [] //bullet: size, position, velocity, lastTime, team
 var map_width = 800
 var map_height = 800
 var m = 20
 var n = 20
+var accV = 0.1
+var accA = 2.0
+var bulletInterval = 30
+
+var s_param = 0.02
+
 var space_grid = []
 for(var i = 0; i < map_width/m; ++i){
 	space_grid.push([])
@@ -23,10 +29,7 @@ function distance(pos1, pos2){
 	tank_data:
 	{
 		id: string 
-		position: {x:int, y:int} //this is confusing, can be removed
-		direction_key_press: [bool, bool, bool, bool]  //left, right, up, down, true if press
-		cannon_direction: int //this is confusing, better change to cursor position, or a new control method(such as to keyboard key for clockwise and counterclockwise)
-		has_new_bullet: bool
+		direction_key_press: [bool, bool, bool, bool, bool, bool]  //a, d, w, s, leftarrow, rightarrow, true if press
 		team: int
 	}
 */
@@ -35,25 +38,21 @@ function on_receive(tank_data){
 	tank_data =  JSON.parse(tank_data)
 	console.log(tank_data)
 	if(!(tank_data["id"] in tank_list)){
-		tank_list[tank_data["id"]] = {id: tank_data["id"], size: 5, position:{x:20, y:20}, velocity:{x:5, y:5}, team:tank_data["team"], hp:50, angle: 0}
+		tank_list[tank_data["id"]] = {id: tank_data["id"], size: 5, position:{x:20, y:20}, velocity:{x:5, y:5}, team:tank_data["team"], hp:50, angle: 0, nextBullet: bulletInterval}
 	}
 
 	var curr_tank = tank_list[tank_data["id"]]
 	console.log(curr_tank)
-	if(tank_data["has_new_bullet"] == true){
-		
-		bullet_array.push({
-			size: 2,
-			position: curr_tank.position,
-			velocity: {x:10 * Math.cos(curr_tank.angle / 180 * 3.1415926) + curr_tank.velocity.x, y:10 * Math.cos(curr_tank.angle / 180 * 3.1415926 + curr_tank.velocity.y)},
-			team: curr_tank["team"]
-		})
-	}
+	
 
-	if (tank_data["direction_key_press"][0] == true)curr_tank["velocity"].x -= 0.1;
-	if (tank_data["direction_key_press"][1] == true)curr_tank["velocity"].x += 0.1;
-	if (tank_data["direction_key_press"][2] == true)curr_tank["velocity"].y += 0.1;
-	if (tank_data["direction_key_press"][3] == true)curr_tank["velocity"].y -= 0.1;
+	if(curr_tank.velocity.x >= -10)if (tank_data["direction_key_press"][0] == true)curr_tank["velocity"].x -= accV;
+	if(curr_tank.velocity.x <= 10) if (tank_data["direction_key_press"][1] == true)curr_tank["velocity"].x += accV;
+	if(curr_tank.velocity.y <= 10)if (tank_data["direction_key_press"][2] == true)curr_tank["velocity"].y += accV;
+	if(curr_tank.velocity.x >= -10)if (tank_data["direction_key_press"][3] == true)curr_tank["velocity"].y -= accV;
+	if (tank_data["direction_key_press"][4] == true)curr_tank["angle"].y += accA;
+	if (tank_data["direction_key_press"][5] == true)curr_tank["angle"].y -= accA;
+	if(curr_tank["angle"] > 360)curr_tank["angle"] -= 360
+	if(curr_tank["angle"] < -360)curr_tank["angle"] += 360
 
 }
 //broadcast bullet and tank position
@@ -71,18 +70,37 @@ function on_send(){
 
 function on_update(){
 	for ([k, v] of Object.entries(tank_list)){
-		v.position.x += v.velocity.x * 0.02
-		v.position.y += v.velocity.y * 0.02
+
+		v.position.x += v.velocity.x * s_param
+		v.position.y += v.velocity.y * s_param
 		if(v.velocity.x > 10)v.velocity.x -= 2;
 		if(v.velocity.x < -10)v.velocity.x += 2;
 		if(v.velocity.y > 10)v.velocity.y -= 2;
 		if(v.velocity.y < -10)v.velocity.y += 2;
+
+		if(v['nextBullet'] == 0){
+			bullet_array.push({
+				size: 2,
+				position: curr_tank.position,
+				velocity: {x:10 * Math.cos(curr_tank.angle / 180 * 3.1415926) + curr_tank.velocity.x * 0.5, y:10 * Math.cos(curr_tank.angle / 180 * 3.1415926 + curr_tank.velocity.y * 0.5)},
+				team: curr_tank["team"]
+			})
+			v['nextBullet'] = bulletInterval
+		}
+		else {
+			v['nextBullet'] -= 1
+		}
+		
+		
 	}
+	
 
 	for (var i = 0; i < bullet_array.length; ++i){
-		bullet_array[i].position.x += bullet_array[i].velocity.x * 0.02
-		bullet_array[i].position.y += bullet_array[i].velocity.y * 0.02
+		bullet_array[i].position.x += bullet_array[i].velocity.x * s_param
+		bullet_array[i].position.y += bullet_array[i].velocity.y * s_param
 	}
+
+
 
 	collision_detection()
 }
