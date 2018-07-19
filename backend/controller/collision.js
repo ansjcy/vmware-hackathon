@@ -202,9 +202,11 @@ function collision_detection(){
 		y_index = Math.floor(v.position.y/n)
 		for(var ii = x_index - 1; ii <= x_index + 1; ++ii){
 			for(var jj = y_index - 1; jj <= y_index + 1; ++jj){
-				if(ii >= 0 && ii < m && jj >= 0 && jj < n){
+				if(ii >= 0 && ii < map_width/m && jj >= 0 && jj < map_height/n){
+					console.log(ii, jj, space_grid[ii][jj])
 					for (var kk = 0; kk < space_grid[ii][jj].length; ++kk){
 						//todo
+
 						
 						var tmp = space_grid[ii][jj][kk]
 						if(v == tmp)continue
