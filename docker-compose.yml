@@ -1,10 +1,28 @@
 version: '2'
+
 services:
+
     backend:
-        build: ./backend
+        image: vmware-hackathon/backend:latest
+        container_name: hackathon-backend
+        build: 
+            dockerfile: Dockerfile
+            context: ./backend
         ports:
-            - "3000:3000"
+            - '3000:3000'
+        networks:
+            - frontend
+
     frontend:
-        build: ./frontend
+        image: vmware-hackathon/frontend:latest
+        container_name: hackathon-frontend
+        build: 
+            dockerfile: Dockerfile
+            context: ./frontend
         ports:
-            - "80:80"
+            - '80:8080'
+        networks:
+            - frontend
+
+networks:
+  frontend:
