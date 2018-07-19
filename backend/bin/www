@@ -98,31 +98,33 @@ function onListening() {
 var io = require('socket.io')(server,{
     serveClient: false
 });
-var client_id = 0;
+var client_id = -1;
 
 io.on('connection', function(socket){
     client_id++;
-    socket.emit('news', 'Welcome');
-    console.log('a user connected');
+    socket.emit('news', client_id);
+    data_process.on_receive({id:client_id, direction_key_press:[false,false,false,false,false,false], team:client_id % 2})
     /**
      * broadcast to all user other than the new client
      */
-    socket.broadcast.emit('newClientConnect', `New ${client_id} clients connects`);
+    //socket.broadcast.emit('newClientConnect', `New ${client_id} clients connects`);
 
     /**
      * Listen to client event
      */
     socket.on('update',function (data) {
-
+      console.log(data);
+      data_process.on_receive(data['tank_data']);
     });
 });
 
-setInterval(()=>{console.log(data_process.on_send())}, 20)
+setInterval(()=>{var tmp = data_process.on_send(); console.log(tmp); io.sockets.emit('push', tmp);
+},40)
 
-setTimeout(()=>{
-    io.sockets.emit("push",{
-        "task_positions":[],
-        "bullect_positions":[],
-        "hp":[]
-    });
-},3000);
+// setTimeout(()=>{
+//     io.sockets.emit("push",{
+//         "task_positions":[],
+//         "bullect_positions":[],
+//         "hp":[]
+//     });
+// },3000);
