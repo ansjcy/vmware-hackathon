@@ -9,7 +9,7 @@ var map_width = 1000
 var map_height = 1000
 var m = 50
 var n = 50
-var accV = 4.0
+var accV = 8.0
 var accA = 10.0
 var bulletInterval = 30
 var blue_team = 0
@@ -18,7 +18,7 @@ var bullet_size = 2.5
 var tank_size = 5
 var bullet_life = 200
 
-var VELLIMIT       = 24
+var VELLIMIT       = 32
 var HP             = 50
 var QUANTUM        = 0.01
 var BULLET_VEL         = 12
