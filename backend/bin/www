@@ -117,7 +117,7 @@ io.on('connection', function(socket){
     });
 });
 
-setInterval(()=>{console.log(data_process.on_send())}, 1000)
+setInterval(()=>{console.log(data_process.on_send())}, 20)
 
 setTimeout(()=>{
     io.sockets.emit("push",{
