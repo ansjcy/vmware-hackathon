@@ -201,7 +201,7 @@ render();
 var socket = io('10.2.123.139:3000');
 
 socket.on('news', function (data) {
-    console.log(data);
+    // console.log(data);
     me.id = parseInt(data);
     me.team = parseInt(data) % 2;
 });
@@ -210,7 +210,7 @@ socket.on('push', function (data) {
     tanksData = [];
     bulletData = [];
 
-    console.log(data);
+    // console.log(data);
 
     data.tank_dict.forEach(function (d) {
         if(d.id === me.id){
@@ -269,3 +269,6 @@ document.addEventListener('keypress', (event) => {
             team: me.team
         } });
 });
+
+
+
