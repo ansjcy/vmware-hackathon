@@ -113,13 +113,12 @@ io.on('connection', function(socket){
      * Listen to client event
      */
     socket.on('update',function (data) {
-      console.log(data);
       data_process.on_receive(data['tank_data']);
     });
 });
 
-setInterval(()=>{var tmp = data_process.on_send(); console.log(tmp); io.sockets.emit('push', tmp);
-},40)
+setInterval(()=>{var tmp = data_process.on_send(); io.sockets.emit('push', tmp);
+},16)
 
 // setTimeout(()=>{
 //     io.sockets.emit("push",{

@@ -9,7 +9,7 @@ var map_width = 1000
 var map_height = 1000
 var m = 50
 var n = 50
-var accV = 0.1
+var accV = 3.0
 var accA = 8.0
 var bulletInterval = 30
 var blue_team = 0
@@ -18,7 +18,7 @@ var bullet_size = 2.5
 var tank_size = 5
 var bullet_life = 150
 
-var VELLIMIT       = 10
+var VELLIMIT       = 15
 var HP             = 50
 var QUANTUM        = 0.01
 var BULLET_VEL         = 10
@@ -71,7 +71,7 @@ function distance(pos1, pos2){
 function on_receive(tank_data){
 	//todo
 	if(!(tank_data["id"] in tank_list)){
-		spawn_pos = tank_data["team"] == blue_team ? {x:20, y:20}:{x:map_width-20, y:map_height-20};
+		spawn_pos = tank_data["team"] == blue_team ? {x:450, y:450}:{x:map_width-450, y:map_height-450};
 		tank_list[tank_data["id"]] = {id: tank_data["id"], size: 5, position:{x:spawn_pos.x, y:spawn_pos.y}, velocity:{x:0, y:0}, 
 			team:tank_data["team"], hp:HP, angle: 0, nextBullet: bulletInterval}
 	}
@@ -112,8 +112,8 @@ function on_update(){
 	for ([k, v] of Object.entries(tank_list)){
 		v.position.x += v.velocity.x * s_param
 		v.position.y += v.velocity.y * s_param
-		v.position.x = v.position.x > map_width ? map_width: (v.position.x < 0 ? 0: v.position.x);
-		v.position.y = v.position.y > map_height ? map_height: (v.position.y < 0 ? 0: v.position.y);
+		v.position.x = v.position.x > map_width - 30 ? map_width - 30: (v.position.x < 30 ? 30: v.position.x);
+		v.position.y = v.position.y > map_height - 30 ? map_height - 30: (v.position.y < 30 ? 30: v.position.y);
 
 		/*
 		if(v.velocity.x > 10)v.velocity.x -= 2;
@@ -121,6 +121,11 @@ function on_update(){
 		if(v.velocity.y > 10)v.velocity.y -= 2;
 		if(v.velocity.y < -10)v.velocity.y += 2;
 		*/
+		if(v.velocity.x > 0)v.velocity.x-= 0.1;
+			else v.velocity.x+= 0.1
+		if(v.velocity.y > 0)v.velocity.y-= 0.1;
+			else v.velocity.y+= 0.1
+
 		v.velocity.x = v.velocity.x < -VELLIMIT ? -VELLIMIT:(v.velocity.x > VELLIMIT ? VELLIMIT:v.velocity.x);
 		v.velocity.y = v.velocity.y < -VELLIMIT ? -VELLIMIT:(v.velocity.y > VELLIMIT ? VELLIMIT:v.velocity.y);
 
@@ -190,7 +195,6 @@ function collision_detection(){
 	for (var i = 0; i < bullet_array.length; ++i) {
 		bullet_array[i].lastTime -= 1;
 		if(bullet_array[i].lastTime > 0){
-			console.log(space_grid.length, Math.floor(bullet_array[i].position.x/m), Math.floor(bullet_array[i].position.y/n))
 			space_grid[Math.floor(bullet_array[i].position.x/m)][Math.floor(bullet_array[i].position.y/n)].push(bullet_array[i])
 			
 		}
@@ -203,7 +207,6 @@ function collision_detection(){
 		for(var ii = x_index - 1; ii <= x_index + 1; ++ii){
 			for(var jj = y_index - 1; jj <= y_index + 1; ++jj){
 				if(ii >= 0 && ii < map_width/m && jj >= 0 && jj < map_height/n){
-					console.log(ii, jj, space_grid[ii][jj])
 					for (var kk = 0; kk < space_grid[ii][jj].length; ++kk){
 						//todo
 
