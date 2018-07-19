@@ -14,42 +14,42 @@ let me =  {
 
     };
 let tanksData = [
-    {
-        "id": 1,
-        "position": {
-            "x": 250,
-            "y": 200
-        },
-        "team": 0,
-        "hp": 50,
-        "cannons": {"direction": 10, "power": 1}
-    },
-    {
-        "id": 2,
-        "position": {
-            "x": 150,
-            "y": 200
-        },
-        "team": 1,
-        "hp": 10,
-        "cannons": {"direction": 180, "power": 1}
-    },
+    // {
+    //     "id": 1,
+    //     "position": {
+    //         "x": 250,
+    //         "y": 200
+    //     },
+    //     "team": 0,
+    //     "hp": 50,
+    //     "cannons": {"direction": 10, "power": 1}
+    // },
+    // {
+    //     "id": 2,
+    //     "position": {
+    //         "x": 150,
+    //         "y": 200
+    //     },
+    //     "team": 1,
+    //     "hp": 10,
+    //     "cannons": {"direction": 180, "power": 1}
+    // },
 ];
 let bulletData = [
-    {
-        "team": 0,
-        "position": {
-            "x" : 150,
-            "y": 220
-        }
-    },
-    {
-        "team": 1,
-        "position": {
-            "x" : 250,
-            "y": 270
-        }
-    }
+    // {
+    //     "team": 0,
+    //     "position": {
+    //         "x" : 150,
+    //         "y": 220
+    //     }
+    // },
+    // {
+    //     "team": 1,
+    //     "position": {
+    //         "x" : 250,
+    //         "y": 270
+    //     }
+    // }
 ];
 
 let render = function () {
@@ -120,7 +120,7 @@ let render = function () {
         })
     };
 
-    d3.select("#gamne-svg").remove();
+    d3.select("#game-svg").remove();
 
     let svg = d3.select("#svg-container")
         .append("svg")
@@ -166,7 +166,7 @@ let render = function () {
         .attr("width", hpbarWidth)
         .attr("height", hpbarHeight)
         .attr("x", mePosX - hpbarWidth / 2)
-        .attr("y", mePosY - hpbarHeight * 6.5)
+        .attr("y", mePosY - hpbarHeight * 10)
         .attr("fill", "none")
         .attr("stroke", "green")
         .attr("stroke-width", "0.2px");
@@ -176,7 +176,7 @@ let render = function () {
         })
         .attr("height", hpbarHeight)
         .attr("x", mePosX - hpbarWidth / 2)
-        .attr("y", mePosY - hpbarHeight * 6.5)
+        .attr("y", mePosY - hpbarHeight * 10)
         .attr("fill", "red")
         .attr("stroke", "none")
         .attr("stroke-width", "0");
@@ -197,10 +197,34 @@ let render = function () {
 
 render();
 
-var socket = io('http://localhost');
+var socket = io('10.2.123.139:3000');
 socket.on('push', function (data) {
+    tanksData = [];
+    bulletData = [];
+
     console.log(data);
-    tanksData = data.tank_dict;
+
+    data.tank_dict.forEach(function (d) {
+        if(d.id === me.id){
+            me.position.x = d.position.x;
+            me.position.y = d.position.y;
+            me.hp = d.hp;
+            me.cannons.direction = d.angle - 90;
+        }
+        else
+        {
+            tanksData.push({
+                "id": d.id,
+                "position": {
+                    "x": d.position.x,
+                    "y": d.position.y
+                },
+                "team": d.team,
+                "hp": d.hp,
+                "cannons": {"direction": d.angle - 90, "power": 1}
+            })
+        }
+    });
     data.bullet_list_team1.forEach(function (d) {
         bulletData.push({
             "team": 0,
