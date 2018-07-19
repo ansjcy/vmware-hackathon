@@ -1,28 +1,59 @@
 
-var tank_list = {} //id, tank.size, tank.position, tank.velocity, tank.team, tank.hp
+var tank_list = {} //id, tank.size, tank.position, tank.velocity, tank.team, tank.angle, tank.hp
 var bullet_array = [] //bullet: size, position, velocity, lastTime, team
 var map_width = 800
 var map_height = 800
 var m = 20
 var n = 20
 var space_grid = []
+for(var i = 0; i < map_width/m; ++i){
+	space_grid.push([])
+	for(var j = 0; j < map_height/n; ++j){
+		space_grid[i].push([])
+		space_grid[i][j].push([])
+	}
+}
 
 
+function distance(pos1, pos2){
+	return Math.sqrt((pos1.x - pos2.x) * (pos1.x - pos2.x) + (pos1.y - pos2.y) * (pos1.y - pos2.y))
+}
 //receive data through front end
 /*
 	tank_data:
 	{
 		id: string 
-		position: {x:int, y:int}
+		position: {x:int, y:int} //this is confusing, can be removed
 		direction_key_press: [bool, bool, bool, bool]  //left, right, up, down, true if press
-		cannon_direction: int
+		cannon_direction: int //this is confusing, better change to cursor position, or a new control method(such as to keyboard key for clockwise and counterclockwise)
 		has_new_bullet: bool
 		team: int
 	}
 */
 function on_receive(tank_data){
 	//todo
-	//update position, 
+	tank_data =  JSON.parse(tank_data)
+	console.log(tank_data)
+	if(!(tank_data["id"] in tank_list)){
+		tank_list[tank_data["id"]] = {id: tank_data["id"], size: 5, position:{x:20, y:20}, velocity:{x:5, y:5}, team:tank_data["team"], hp:50, angle: 0}
+	}
+
+	var curr_tank = tank_list[tank_data["id"]]
+	console.log(curr_tank)
+	if(tank_data["has_new_bullet"] == true){
+		
+		bullet_array.push({
+			size: 2,
+			position: curr_tank.position,
+			velocity: {x:10 * Math.cos(curr_tank.angle / 180 * 3.1415926) + curr_tank.velocity.x, y:10 * Math.cos(curr_tank.angle / 180 * 3.1415926 + curr_tank.velocity.y)},
+			team: curr_tank["team"]
+		})
+	}
+
+	if (tank_data["direction_key_press"][0] == true)curr_tank["velocity"].x -= 0.1;
+	if (tank_data["direction_key_press"][1] == true)curr_tank["velocity"].x += 0.1;
+	if (tank_data["direction_key_press"][2] == true)curr_tank["velocity"].y += 0.1;
+	if (tank_data["direction_key_press"][3] == true)curr_tank["velocity"].y -= 0.1;
 
 }
 //broadcast bullet and tank position
@@ -38,19 +69,22 @@ function on_send(){
 
 }
 
-
-
-function distance(pos1, pos2){
-	return Math.sqrt((pos1.x - pos2.x) * (pos1.x - pos2.x) + (pos1.y - pos2.y) * (pos1.y - pos2.y))
-}
-
-
-for(var i = 0; i < map_width/m; ++i){
-	space_grid.push([])
-	for(var j = 0; j < map_height/n; ++j){
-		space_grid[i].push([])
-		space_grid[i][j].push([])
+function on_update(){
+	for ([k, v] of Object.entries(tank_list)){
+		v.position.x += v.velocity.x * 0.02
+		v.position.y += v.velocity.y * 0.02
+		if(v.velocity.x > 10)v.velocity.x -= 2;
+		if(v.velocity.x < -10)v.velocity.x += 2;
+		if(v.velocity.y > 10)v.velocity.y -= 2;
+		if(v.velocity.y < -10)v.velocity.y += 2;
 	}
+
+	for (var i = 0; i < bullet_array.length; ++i){
+		bullet_array[i].position.x += bullet_array[i].velocity.x * 0.02
+		bullet_array[i].position.y += bullet_array[i].velocity.y * 0.02
+	}
+
+	collision_detection()
 }
 
 
@@ -151,9 +185,10 @@ function collision_detection(){
 }
 
 function test(){
+
 	tank_list = {
-		"aaa" : {id: "aaa", size: 5, position:{x:230, y:230}, velocity:{x:5, y:5}, team:1, hp:50},
-		"bbb" : {id: "bbb", size: 5, position:{x:230, y:235}, velocity:{x:5, y:5}, team:2, hp:50}
+		"aaa" : {id: "aaa", size: 5, position:{x:230, y:230}, velocity:{x:5, y:5}, team:1, hp:50, angle:30},
+		"bbb" : {id: "bbb", size: 5, position:{x:230, y:235}, velocity:{x:5, y:5}, team:2, hp:50, angle:30}
 		// "ccc" : {id: "ccc", size: 5, position:{x:240, y:240}, velocity:{x:5, y:5}, team:1, hp:50},
 		// "ddd" : {id: "ddd", size: 5, position:{x:220, y:280}, velocity:{x:5, y:5}, team:2, hp:50},
 		// "eee" : {id: "eee", size: 5, position:{x:235, y:235}, velocity:{x:5, y:5}, team:1, hp:50},
@@ -164,14 +199,27 @@ function test(){
 		// "jjj" : {id: "jjj", size: 5, position:{x:535, y:540}, velocity:{x:5, y:5}, team:2, hp:50}
 	}
 	 bullet_array = [
-	 	{size:2, position:{x:230, y:240}, lastTime:5, team:1},
+	 	{size:2, position:{x:230, y:240}, velocity:{x:10, y:10}, lastTime:5, team:1},
 	// 	{size:2, position:{x:245, y:245}, lastTime:5, team:2},
 	// 	{size:2, position:{x:530, y:535}, lastTime:5, team:1},
 	// 	{size:2, position:{x:540, y:550}, lastTime:5, team:2},
 	// 	{size:2, position:{x:540, y:540}, lastTime:5, team:1}
 	]
-	collision_detection()
-	collision_detection()
+
+	on_receive('{"id": "ccc", "team":2, "has_new_bullet":true, "direction_key_press":[true, false, true, false]}')
+	on_receive('{"id": "ccc", "team":2, "has_new_bullet":false, "direction_key_press":[true, false, true, false]}')
+	on_receive('{"id": "ccc", "team":2, "has_new_bullet":false, "direction_key_press":[true, false, true, false]}')
+	on_receive('{"id": "ccc", "team":2, "has_new_bullet":false, "direction_key_press":[true, false, true, false]}')
+	on_receive('{"id": "ccc", "team":2, "has_new_bullet":true, "direction_key_press":[true, false, true, false]}')
+	
+
+	// on_update()
+	// on_update()
+	// on_update()
+	// on_update()
+	// on_update()
+	// on_update()
+	// on_update()
 
 	console.log(tank_list)
 	console.log(bullet_array)
