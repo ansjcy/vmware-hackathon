@@ -197,7 +197,7 @@ let render = function () {
 
 render();
 
-var socket = io('10.2.123.139:3000');
+var socket = io('localhost:3000');
 socket.on('push', function (data) {
     tanksData = [];
     bulletData = [];
