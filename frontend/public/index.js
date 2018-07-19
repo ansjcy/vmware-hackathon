@@ -198,6 +198,7 @@ let render = function () {
 
 render();
 
+<<<<<<< HEAD
 var socket = io('10.2.123.139:3000');
 
 socket.on('news', function (data) {
@@ -206,6 +207,9 @@ socket.on('news', function (data) {
     me.team = parseInt(data) % 2;
 });
 
+=======
+var socket = io('localhost:3000');
+>>>>>>> 6089f1e5b493055881fefd977ac49965f62537a9
 socket.on('push', function (data) {
     tanksData = [];
     bulletData = [];

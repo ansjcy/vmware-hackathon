@@ -7,10 +7,10 @@ var bullet_array = [] //bullet: size, position, velocity, lastTime, team
 
 var map_width = 1000
 var map_height = 1000
-var m = 20
-var n = 20
+var m = 50
+var n = 50
 var accV = 0.1
-var accA = 2.0
+var accA = 8.0
 var bulletInterval = 30
 var blue_team = 0
 var red_team = 1
@@ -25,26 +25,26 @@ var BULLET_VEL         = 10
 
 var s_param = 0.02
 
-tank_list = {
-		"aaa" : {id: "aaa", size: tank_size, position:{x:230, y:230}, velocity:{x:5, y:5}, team:blue_team, hp:50, angle:30},
-		"bbb" : {id: "bbb", size: tank_size, position:{x:230, y:235}, velocity:{x:5, y:5}, team:red_team, hp:50, angle:30},
-		"ccc" : {id: "ccc", size: tank_size, position:{x:235, y:240}, velocity:{x:0, y:0}, team:red_team, hp:50, angle:30}
-		// "ddd" : {id: "ddd", size: 5, position:{x:220, y:280}, velocity:{x:5, y:5}, team:2, hp:50},
-		// "eee" : {id: "eee", size: 5, position:{x:235, y:235}, velocity:{x:5, y:5}, team:1, hp:50},
-		// "fff" : {id: "fff", size: 5, position:{x:232, y:232}, velocity:{x:5, y:5}, team:2, hp:50},
-		// "ggg" : {id: "ggg", size: 5, position:{x:230, y:230}, velocity:{x:5, y:5}, team:1, hp:50},
-		// "hhh" : {id: "hhh", size: 5, position:{x:530, y:530}, velocity:{x:5, y:5}, team:2, hp:50},
-		// "iii" : {id: "iii", size: 5, position:{x:530, y:535}, velocity:{x:5, y:5}, team:1, hp:50},
-		// "jjj" : {id: "jjj", size: 5, position:{x:535, y:540}, velocity:{x:5, y:5}, team:2, hp:50}
-	}
-bullet_array = [
-	 	{size:bullet_size, position:{x:230, y:240}, velocity:{x:10, y:10}, lastTime:bullet_life, team:blue_team},
-		{size:bullet_size, position:{x:245, y:245}, velocity:{x:-10, y:-10}, lastTime:bullet_life, team:red_team},
-		{size:bullet_size, position:{x:250, y:250}, velocity:{x:10, y:10}, lastTime:bullet_life, team:blue_team}
-	// 	{size:2, position:{x:530, y:535}, lastTime:5, team:1 },
-	// 	{size:2, position:{x:540, y:550}, lastTime:5, team:2},
-	// 	{size:2, position:{x:540, y:540}, lastTime:5, team:1}
-	]
+// tank_list = {
+// 		"aaa" : {id: "aaa", size: tank_size, position:{x:230, y:230}, velocity:{x:5, y:5}, team:blue_team, hp:50, angle:30},
+// 		"bbb" : {id: "bbb", size: tank_size, position:{x:230, y:235}, velocity:{x:5, y:5}, team:red_team, hp:50, angle:30},
+// 		"ccc" : {id: "ccc", size: tank_size, position:{x:235, y:240}, velocity:{x:0, y:0}, team:red_team, hp:50, angle:30}
+// 		// "ddd" : {id: "ddd", size: 5, position:{x:220, y:280}, velocity:{x:5, y:5}, team:2, hp:50},
+// 		// "eee" : {id: "eee", size: 5, position:{x:235, y:235}, velocity:{x:5, y:5}, team:1, hp:50},
+// 		// "fff" : {id: "fff", size: 5, position:{x:232, y:232}, velocity:{x:5, y:5}, team:2, hp:50},
+// 		// "ggg" : {id: "ggg", size: 5, position:{x:230, y:230}, velocity:{x:5, y:5}, team:1, hp:50},
+// 		// "hhh" : {id: "hhh", size: 5, position:{x:530, y:530}, velocity:{x:5, y:5}, team:2, hp:50},
+// 		// "iii" : {id: "iii", size: 5, position:{x:530, y:535}, velocity:{x:5, y:5}, team:1, hp:50},
+// 		// "jjj" : {id: "jjj", size: 5, position:{x:535, y:540}, velocity:{x:5, y:5}, team:2, hp:50}
+// 	}
+// bullet_array = [
+// 	 	{size:bullet_size, position:{x:230, y:240}, velocity:{x:10, y:10}, lastTime:bullet_life, team:blue_team},
+// 		{size:bullet_size, position:{x:245, y:245}, velocity:{x:-10, y:-10}, lastTime:bullet_life, team:red_team},
+// 		{size:bullet_size, position:{x:250, y:250}, velocity:{x:10, y:10}, lastTime:bullet_life, team:blue_team}
+// 	// 	{size:2, position:{x:530, y:535}, lastTime:5, team:1 },
+// 	// 	{size:2, position:{x:540, y:550}, lastTime:5, team:2},
+// 	// 	{size:2, position:{x:540, y:540}, lastTime:5, team:1}
+// 	]
 
 var space_grid = []
 for(var i = 0; i < map_width/m; ++i){
@@ -70,8 +70,6 @@ function distance(pos1, pos2){
 */
 function on_receive(tank_data){
 	//todo
-	tank_data =  JSON.parse(tank_data)
-	console.log(tank_data)
 	if(!(tank_data["id"] in tank_list)){
 		spawn_pos = tank_data["team"] == blue_team ? {x:20, y:20}:{x:map_width-20, y:map_height-20};
 		tank_list[tank_data["id"]] = {id: tank_data["id"], size: 5, position:{x:spawn_pos.x, y:spawn_pos.y}, velocity:{x:0, y:0}, 
@@ -79,7 +77,6 @@ function on_receive(tank_data){
 	}
 
 	var curr_tank = tank_list[tank_data["id"]]
-	console.log(curr_tank)
 	
 
 	vel = {x:curr_tank['velocity'].x, y:curr_tank['velocity'].y};
@@ -130,10 +127,11 @@ function on_update(){
 		if(v['nextBullet'] == 0){
 			bullet_array.push({
 				size: bullet_size,
-				position: {x:curr_tank.position.x, y:curr_tank.position.y},
-				velocity: {x:10 * Math.cos(curr_tank.angle / 180 * Math.PI) + curr_tank.velocity.x * 0.5, 
-					y:10 * Math.cos(curr_tank.angle / 180 * Math.PI + curr_tank.velocity.y * 0.5)},
-				team: curr_tank["team"]
+				position: {x:v.position.x, y:v.position.y},
+				velocity: {x:30 * Math.cos(v.angle / 180 * Math.PI) , 
+					y:30 * Math.sin(v.angle / 180 * Math.PI )},
+				team: v["team"],
+				lastTime: bullet_life
 			})
 			v['nextBullet'] = bulletInterval
 		}
@@ -148,6 +146,7 @@ function on_update(){
 	for (var i = 0; i < bullet_array.length; ++i){
 		bullet_array[i].position.x += bullet_array[i].velocity.x * s_param
 		bullet_array[i].position.y += bullet_array[i].velocity.y * s_param
+		if (bullet_array[i].position.x <= 10 || bullet_array[i].position.x >= map_width - 10 || bullet_array[i].position.y <= 10 || bullet_array[i].position.y > map_height - 10)bullet_array[i].lastTime = -1;
 	}
 
 
@@ -158,12 +157,12 @@ function on_update(){
 
 function on_send(){
 	on_update()
-	var tank_data_send = {}
+	var tank_data_send = []
 	var bullet_list_team1 = []
 	var bullet_list_team2 = []
 
 	for ([k, v] of Object.entries(tank_list)){
-		tank_data_send[k] = {'id':v.id, 'team':v.team, 'position':v.position, 'hp':v.hp, angle:v.angle}
+		tank_data_send.push({'id':v.id, 'team':v.team, 'position':v.position, 'hp':v.hp, angle:v.angle})
 	}
 
 	for (var i = 0; i < bullet_array.length; ++i){
@@ -176,7 +175,7 @@ function on_send(){
 		}
 	}
 
-	return {"id":tank_data_send, "bullet_list_team1":bullet_list_team1, "bullet_list_team2":bullet_list_team2}
+	return {"tank_dict":tank_data_send, "bullet_list_team1":bullet_list_team1, "bullet_list_team2":bullet_list_team2}
 }
 
 function collision_detection(){
@@ -191,6 +190,7 @@ function collision_detection(){
 	for (var i = 0; i < bullet_array.length; ++i) {
 		bullet_array[i].lastTime -= 1;
 		if(bullet_array[i].lastTime > 0){
+			console.log(space_grid.length, Math.floor(bullet_array[i].position.x/m), Math.floor(bullet_array[i].position.y/n))
 			space_grid[Math.floor(bullet_array[i].position.x/m)][Math.floor(bullet_array[i].position.y/n)].push(bullet_array[i])
 			
 		}
@@ -202,9 +202,11 @@ function collision_detection(){
 		y_index = Math.floor(v.position.y/n)
 		for(var ii = x_index - 1; ii <= x_index + 1; ++ii){
 			for(var jj = y_index - 1; jj <= y_index + 1; ++jj){
-				if(ii >= 0 && ii < m && jj >= 0 && jj < n){
+				if(ii >= 0 && ii < map_width/m && jj >= 0 && jj < map_height/n){
+					console.log(ii, jj, space_grid[ii][jj])
 					for (var kk = 0; kk < space_grid[ii][jj].length; ++kk){
 						//todo
+
 						
 						var tmp = space_grid[ii][jj][kk]
 						if(v == tmp)continue
@@ -290,8 +292,6 @@ function test(){
 	// on_update()
 	// on_update()
 
-	console.log(tank_list)
-	console.log(bullet_array)
 
 
 }
