@@ -122,12 +122,13 @@ let render = function () {
 
     d3.select("#game-svg").remove();
 
-    let svg = d3.select("#svg-container")
+    let svgRaw = d3.select("#svg-container")
         .append("svg")
         .attr("width", svg_width)
         .attr("height", svg_height)
-        .attr("id", "game-svg")
-        .append("g")
+        .attr("id", "game-svg");
+
+    let svg = svgRaw.append("g")
         .attr("id", "svg-group")
         .attr("transform", function () {
             let transX = (1 - scaleFactor) * mePosX;
@@ -198,6 +199,13 @@ let render = function () {
 render();
 
 var socket = io('10.2.123.139:3000');
+
+socket.on('news', function (data) {
+    console.log(data);
+    me.id = parseInt(data);
+    me.team = parseInt(data) % 2;
+});
+
 socket.on('push', function (data) {
     tanksData = [];
     bulletData = [];
